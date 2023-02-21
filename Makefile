@@ -43,5 +43,5 @@ buildupdater: $(subst .coffee,.coffee.js,${UPDATER_SCRIPT_COFFEE_FILES})
 
 clean: clean-base
 
-zip: build ## build zip file
+zip: buildinfojson build 
 	cd build && zip ${ZIP_NAME} -r custom-data-type-finto/
