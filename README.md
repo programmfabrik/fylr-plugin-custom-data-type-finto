@@ -17,21 +17,12 @@ The parameters of this plugin are based very closely on the parameters of the FI
 - nodejs-Version >= 18 OR nodejs-Version >= 12 with added "fetch"-Module
 
 ## installation
-Clone the repository to your fylr-installation. For example to `/fylr/config/extensionplugins/custom-data-type-finto`
 
-Add the following to your fylr.yml
-```
-fylr:
-  plugin:
-    paths:
-      - "/fylr/config/extensionplugins/custom-data-type-finto"
-```
+The latest version of this plugin can be found [here](https://github.com/programmfabrik/fylr-custom-data-type-finto/releases/latest/download/customDataTypeFinto.zip).
 
-Go to `/fylr/config/extensionplugins/custom-data-type-finto` and execute `$ make build`
+The ZIP can be downloaded and installed using the plugin manager, or used directly (recommended).
 
-Restart fylr-container. For example via `docker restart fylr`
-
-Browse to <https://your-fylr.com/pluginmanager> and activate this plugin. Reload fylr-webapp in browser. Done.
+Github has an overview page to get a list of [all release](https://github.com/programmfabrik/fylr-custom-data-type-finto/releases/).
 
 ## configuration
 
