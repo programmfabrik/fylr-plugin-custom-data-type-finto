@@ -12,13 +12,13 @@ plugin:
     en-US: Links to the Finnish thesaurus and ontology service FINTO
     fi-FI: Linkkejä suomalaiseen asiasanasto- ja ontologiapalveluun FINTO
     sv-SE: Länkar till den finska tesaurus- och ontologitjänsten FINTO
-  server:
-    api-version:
-      require: 1
+  l10n: l10n/customDataTypeFinto.csv
   webfrontend:
-    l10n: l10n/
-    url: custom-data-type-finto.js
-    css: custom-data-type-finto.css
+    url: customDataTypeFinto.js
+    css: customDataTypeFinto.css
+
+base_url_prefix: "webfrontend"
+
 custom_types:
   finto:
     mapping:
@@ -67,7 +67,7 @@ custom_types:
               type: body
             args:
               - type: "value"
-                value: "%_exec.pluginDir%/build/updater/finto-update.js"
+                value: "%_exec.pluginDir%/build/updater/customDataTypeFintoUpdater.js"
               - type: "value"
                 value: "%info.json%"
       timeout: 60

@@ -1,26 +1,13 @@
+ZIP_NAME ?= "customDataTypeFinto.zip"
+
 PLUGIN_NAME = custom-data-type-finto
 PLUGIN_PATH = easydb-custom-data-type-finto
-
-L10N_FILES = easydb-library/src/commons.l10n.csv \
-             l10n/$(PLUGIN_NAME).csv
-
-INSTALL_FILES = \
-	$(WEB)/l10n/cultures.json \
-	$(WEB)/l10n/de-DE.json \
-	$(WEB)/l10n/en-US.json \
-	$(WEB)/l10n/fi-FI.json \
-	$(WEB)/l10n/sv-SE.json \
-	$(JS) \
-	$(CSS) \
-	build/updater/finto-update.js \
-	manifest.yml
 
 COFFEE_FILES = easydb-library/src/commons.coffee \
 	src/webfrontend/FINTOUtilities.coffee \
 	src/webfrontend/CustomDataTypeFINTO.coffee \
 	src/webfrontend/CustomDataTypeFINTOFacet.coffee \
   src/webfrontend/CustomDataTypeFINTOTreeview.coffee
-
 
 CSS_FILE = src/webfrontend/css/main.css
 
@@ -39,15 +26,22 @@ include easydb-library/tools/base-plugins.make
 
 build: code buildupdater buildinfojson
 
-code: $(subst .coffee,.coffee.js,${COFFEE_FILES}) $(L10N)
+code: $(subst .coffee,.coffee.js,${COFFEE_FILES})
 	mkdir -p build
-	mkdir -p build/webfrontend
-	cat $^ > build/webfrontend/custom-data-type-finto.js
-	cat $(CSS_FILE) >> build/webfrontend/custom-data-type-finto.css
+	mkdir -p build/custom-data-type-finto
+	mkdir -p build/custom-data-type-finto/webfrontend
+	cp -r l10n build/custom-data-type-finto
+	cat $^ > build/custom-data-type-finto/webfrontend/customDataTypeFinto.js
+	cat $(CSS_FILE) >> build/custom-data-type-finto/webfrontend/customDataTypeFinto.css
+	cp manifest.yml build/custom-data-type-finto/manifest.yml
+	cp build-info.json build/custom-data-type-finto/build-info.json
 
 buildupdater: $(subst .coffee,.coffee.js,${UPDATER_SCRIPT_COFFEE_FILES})
-	mkdir -p build/updater
-	cat $^ > build/updater/finto-update.js
-	cat $(UPDATER_SCRIPT) >> build/updater/finto-update.js
+	mkdir -p build/custom-data-type-finto/updater
+	cat $^ > build/custom-data-type-finto/updater/customDataTypeFintoUpdater.js
+	cat $(UPDATER_SCRIPT) >> build/custom-data-type-finto/updater/customDataTypeFintoUpdater.js
 
 clean: clean-base
+
+zip: build ## build zip file
+	cd build && zip ${ZIP_NAME} -r custom-data-type-finto/
