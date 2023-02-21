@@ -9,6 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Install coffeescript-compiler
+        run: sudo apt-get install coffeescript
+
       - name: Checkout
         uses: actions/checkout@v2
         with:
