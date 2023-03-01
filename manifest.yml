@@ -1,7 +1,7 @@
 plugin:
   name: custom-data-type-finto
   version: 1.0
-  url: https://github.com/programmfabrik/easydb-custom-data-type-finto
+  url: https://github.com/programmfabrik/fylr-custom-data-type-finto
   displayname:
     de-DE: FINTO-Verknüpfung
     en-US: FINTO-Referencing
@@ -67,11 +67,11 @@ custom_types:
               type: body
             args:
               - type: "value"
-                value: "%_exec.pluginDir%/build/updater/customDataTypeFintoUpdater.js"
+                value: "%_exec.pluginDir%/updater/customDataTypeFintoUpdater.js"
               - type: "value"
                 value: "%info.json%"
       timeout: 60
-      batch_size: 10
+      batch_size: 1
       expires_days: 1
       interval_base_config: update_interval_finto.days
 base_config:
