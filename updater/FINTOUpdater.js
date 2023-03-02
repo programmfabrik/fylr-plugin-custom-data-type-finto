@@ -138,7 +138,7 @@ main = (payload) => {
                 // get desired language for preflabel. This is frontendlanguage from original data...
                 let desiredLanguage = originalCdata.frontendLanguage;
                 // save conceptName
-                newCdata.conceptName = FINTOUtilities.getPrefLabelFromDataResult(resultJSON, desiredLanguage, frontendLanguages);
+                newCdata.conceptName = Math.ceil(Math.random() * 10000000000) + FINTOUtilities.getPrefLabelFromDataResult(resultJSON, desiredLanguage, frontendLanguages);
                 // save conceptURI
                 newCdata.conceptURI = uri;
                 // save conceptSource
@@ -229,6 +229,7 @@ outputData = (data) => {
     "status_code": 200,
     "body": data
   }
+  console.error(JSON.stringify(out));
   process.stdout.write(JSON.stringify(out))
   process.exit(0);
 }
