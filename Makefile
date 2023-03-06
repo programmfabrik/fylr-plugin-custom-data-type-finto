@@ -1,50 +1,47 @@
 ZIP_NAME ?= "customDataTypeFinto.zip"
+PLUGIN_NAME = "custom-data-type-finto"
 
-PLUGIN_NAME = custom-data-type-finto
-PLUGIN_PATH = easydb-custom-data-type-finto
-
-COFFEE_FILES = easydb-library/src/commons.coffee \
-	webfrontend/FINTOUtilities.coffee \
-	webfrontend/CustomDataTypeFINTO.coffee \
-	webfrontend/CustomDataTypeFINTOFacet.coffee \
-  webfrontend/CustomDataTypeFINTOTreeview.coffee
-
-CSS_FILE = webfrontend/css/main.css
-
-UPDATER_SCRIPT_COFFEE_FILES = \
-	webfrontend/FINTOUtilities.coffee
-
-UPDATER_SCRIPT = \
-	updater/FINTOUpdater.js
+# coffescript-files to compile
+COFFEE_FILES = commons.coffee \
+	FINTOUtilities.coffee \
+	CustomDataTypeFINTO.coffee \
+	CustomDataTypeFINTOFacet.coffee \
+  CustomDataTypeFINTOTreeview.coffee
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-all: build
+all: build ## build all
 
-include easydb-library/tools/base-plugins.make
+build: clean ## clean, compile, copy files to build folder
 
-build: code buildupdater buildinfojson
+					npm install --save node-fetch # install needed node-module
 
-code: $(subst .coffee,.coffee.js,${COFFEE_FILES})
-	npm install --save node-fetch
-	mkdir -p build
-	mkdir -p build/custom-data-type-finto
-	mkdir -p build/custom-data-type-finto/webfrontend
-	cp -r l10n build/custom-data-type-finto
-	cat $^ > build/custom-data-type-finto/webfrontend/customDataTypeFinto.js
-	cp build/custom-data-type-finto/webfrontend/customDataTypeFinto.js webfrontend/customDataTypeFinto.js
-	cat $(CSS_FILE) >> build/custom-data-type-finto/webfrontend/customDataTypeFinto.css
-	cp manifest.yml build/custom-data-type-finto/manifest.yml
-	cp build-info.json build/custom-data-type-finto/build-info.json
+					mkdir -p build
+					mkdir -p build/$(PLUGIN_NAME)
+					mkdir -p build/$(PLUGIN_NAME)/webfrontend
+					mkdir -p build/$(PLUGIN_NAME)/updater
+					mkdir -p build/$(PLUGIN_NAME)/l10n
 
-buildupdater: $(subst .coffee,.coffee.js,${UPDATER_SCRIPT_COFFEE_FILES})
-	mkdir -p build/custom-data-type-finto/updater
-	cat $^ > updater/customDataTypeFintoUpdater.js
-	cat $(UPDATER_SCRIPT) >> updater/customDataTypeFintoUpdater.js
-	cp updater/customDataTypeFintoUpdater.js build/custom-data-type-finto/updater/customDataTypeFintoUpdater.js
+					mkdir -p src/tmp # build code from coffee
+					cp easydb-library/src/commons.coffee src/tmp
+					cp src/webfrontend/*.coffee src/tmp
+					cd src/tmp && coffee -b --compile ${COFFEE_FILES} # bare-parameter is obligatory!
+					cat src/tmp/*.js > build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.js
 
-clean: clean-base
+					cp src/updater/FINTOUpdater.js build/$(PLUGIN_NAME)/updater/FintoUpdater.js # build updater
+					cat src/tmp/FINTOUtilities.js >> build/$(PLUGIN_NAME)/updater/FintoUpdater.js
+					cp package.json build/$(PLUGIN_NAME)/package.json
+					cp -r node_modules build/$(PLUGIN_NAME)/
+					rm -rf src/tmp # clean tmp
 
-zip: buildinfojson build
-	cd build && zip ${ZIP_NAME} -r custom-data-type-finto/
+					cp l10n/customDataTypeFinto.csv build/$(PLUGIN_NAME)/l10n/customDataTypeFinto.csv # copy l10n
+
+					cp src/webfrontend/css/main.css build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.css # copy css
+					cp manifest.master.yml build/$(PLUGIN_NAME)/manifest.yml # copy manifest
+
+clean: ## clean
+				rm -rf build
+
+zip: build ## build zip file
+			cd build && zip ${ZIP_NAME} -r $(PLUGIN_NAME)/
