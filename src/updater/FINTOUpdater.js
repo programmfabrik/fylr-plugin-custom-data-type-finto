@@ -92,11 +92,7 @@ main = (payload) => {
         let results = [];
         data.forEach((data, index) => {
           let url = requests[index].url;
-          console.error("url");
-          console.error(url);
           let uri = requests[index].uri;
-          console.error("uri");
-          console.error(uri);
           let requestType = (url.includes('hierarchy?uri')) ? 'broader' : 'data';
           let result = {
             url: url,
@@ -115,8 +111,6 @@ main = (payload) => {
         let cdataList = [];
         payload.objects.forEach((result, index) => {
           let originalCdata = payload.objects[index].data;
-          console.error("originalCdata");
-          console.error(originalCdata);
           let newCdata = {};
           let originalURI = originalCdata.conceptURI;
 
@@ -193,11 +187,7 @@ main = (payload) => {
               // merge ancestors to string
               newCdata.conceptAncestors = newCdata.conceptAncestors.join(' ');
 
-              console.error("newCdata");
-              console.error(newCdata);
-
               if (hasChanges(payload.objects[index].data, newCdata)) {
-                console.error("_________________________has changes!!________________");
                 payload.objects[index].data = newCdata;
               } else {}
             }
