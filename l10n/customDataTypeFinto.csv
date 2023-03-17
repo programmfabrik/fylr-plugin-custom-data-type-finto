@@ -1,60 +1,60 @@
-key,de-DE,en-US,fi-FI,sv-SE,
-server.config.name.system.update_interval_finto,Updateeinstellungen für FINTO-Verknüpfungen,Update settings for FINTO-Relations,FINTO linkityksen asetukset,Uppdateringsinställningar för FINTO-länkar,
-server.config.parameter.system.update_interval_finto.days.label,Tage zwischen Updates,Days between updates,Päiviä päivitysten välillä,Dagar mellan uppdateringar,
-server.config.parameter.system.update_interval_finto.default_language.label,Standard-Datensprache als Fallback für Update (ISO 639-1),Default-data-language (as fallback) for update (ISO 639-1),Päivityksen oletuskieli (ISO 639-1),Standarddataspråk som reserv för uppdatering (ISO 639-1),
-custom.data.type.finto.name,FINTO-Verknüpfung,FINTO-Relation,FINTO linkitys,FINTO-relation,
-custom.data.type.finto.parent.name,Eltern-URI,Parent-URI,Ylätason URI,Förälder-URI,
-custom.data.type.finto.language.name,Sprache,Language,Kieli,Språk,
-custom.data.type.finto.config.parameter.schema.vocabulary_notation.value.label,Vokabular-Notation,Vocabulary-notation,Sanastot välilyönnillä erotettuna,Vokabulärnotation,
-custom.data.type.finto.setting.schema.no_vocabulary_notation,Keine Vokabular-Notation gegeben,No vocabulary-notation given,Sanastoja ei ole määritetty,Ingen vokabulärnotation angiven,
-custom.data.type.finto.config.parameter.schema.vocabulary_parent.value.label,Parent-URI (only dropdown and popup-mode. Not treeview. Obligatory for drilldown!),Parent-URI (only dropdown and popup-mode. Not treeview. Obligatory for drilldown!),Ylätason URI (vain pudotusvalikossa ja ponnahdusikkunassa. Ei puunäkymässä. Pakollinen yksityiskohtiin!),Förälder-URI (endast dropdown- och popup-läge. Obligatorisk för att granska nedåt!),
-custom.data.type.finto.setting.schema.vocabulary_parent,Keine Parent-URI hinterlegt,No parent URI given,Ylätason URI-osoitetta ei ole annettu,Ingen förälder-URI angiven,
-custom.data.type.finto.setting.schema,Keine Suchsprache hinterlegt,No searchlanguage given,Hakukieltä ei ole annettu,Inget sökspråk angivet,
-custom.data.type.finto.modal.form.dropdown.nolabelinlanguagefound,Kein Label in aktiver Sprache,No Label in active language,Ei tunnistetta aktiivisella kielellä,Ingen etikett på aktivt språk,
-custom.data.type.finto.config.parameter.mask.editor_style.value.label,Editor-Stil,Editor-Style,Editorin tyyli,Redigerarstil,
-custom.data.type.finto.config.option.mask.editor_style.value.popover,Popover,Popover,Ponnahdusikkuna,Popup,
-custom.data.type.finto.config.option.mask.editor_style.value.dropdown,Dropdown,Dropdown,Alasvetovalikko,Rullgardinsmeny,
-custom.data.type.finto.config.option.mask.editor_style.value.popover_treeview,Popover mit Baumansicht,Popover with treeview,Puunäkymän ponnahdusikkuna,Popup med trädvy,
-custom.data.type.finto.config.parameter.mask.allow_label_choice.value.label,Erlaube die händische Auswahl aus den gegebenen Labels,Allow manual choice from available labels,Salli manuaalinen valinta,Tillåt manuellt val från givna etiketter,
-custom.data.type.finto.config.parameter.mask.allow_label_choice.value.checkbox,Erlaubt,Allowed,Sallittu,Tillåtet,
-custom.data.type.finto.config.parameter.mask.default_concept_uri.value.label,Standard-URI,Standard-URI,Oletus-URI,Standard-URI,
-custom.data.type.finto.config.parameter.mask.default_concept_name.value.label,Standard-Name,Standard-Name,Oletusnimi,Standardnamn,
-custom.data.type.finto.modal.form.popup.choose,"Auswahl aus dem ""Finnischen Thesaurus und Ontology Service ""","Choose record from ""Finnish Thesaurus and Ontology Service""",Valinta Fintosta,"Val från ""Finnish Thesaurus and Ontology Service""",
-custom.data.type.finto.modal.form.text.searchbar,Suchbegriff eingeben,Enter searchterm,Anna hakutermi,Ange sökterm,
-custom.data.type.finto.modal.form.text.searchbar.placeholder, tippen ... ,type sth. ...,etsi…,fyll i ...,
-custom.data.type.finto.modal.form.loadingSuggestions,Vorschläge werden geladen,Suggestions are being loaded,Ehdotuksia ladataan,Förslag laddas,
-custom.data.type.finto.modal.form.popup.suggest.nohit,Kein Treffer,No hit,Ei tuloksia,Inga resultat,
-custom.data.type.finto.modal.form.text.count,Maximale Treffer,Max hits,Tuloksien maksimimäärä,Maximala resultat,
-custom.data.type.finto.modal.form.text.count_short,Treffer,hits,tulosta,Resultat,
-custom.data.type.finto.modal.form.popup.loadingstring,Weitere Informationen laden,loading full information,ladataan täydet tiedot,Ladda mer information,
-custom.data.type.finto.modal.form.dropdown.selectvocabularyLabel,Vokabular,Vocabulary,Sanasto,Vokabulär,
-custom.data.type.finto.modal.form.dropdown.choosefromvocall,Alle Vokabulare,All vocabularys,Kaikki sanastot,Alla vokabulärer,
-custom.data.type.finto.modal.form.popup.treeview.nopreflabel,ohne Label,without label,ilman tunnistetta,utan etikett,
-custom.data.type.finto.modal.form.popup.json.preview.nopreflabel,ohne Label,without label,ilman tunnistetta,utan etikett,
-custom.data.type.finto.modal.form.popup.jsonpreview.terms,Bezeichnungen,Terms,Muunkieliset termit,Benämningar,
-custom.data.type.finto.modal.form.popup.jsonpreview.altterms,Andere Bezeichnungen,Alternative terms,Vaihtoehtoiset termit,Andra benämningar,
-custom.data.type.finto.modal.form.popup.jsonpreview.hiddenterms,Versteckte Bezeichnungen,Hidden terms,Piilotetut termit,Dolda benämningar,
-custom.data.type.finto.modal.form.popup.jsonpreview.definition,Definition,Definition,Määritelmä,Definition,
-custom.data.type.finto.modal.form.popup.jsonpreview.scopenote,Verwendungshinweis,ScopeNote,Käyttöilmoitus,Användningsanvisning,
-custom.data.type.finto.modal.form.popup.jsonpreview.note,Notiz,Note,Lisätiedot,Notering,
-custom.data.type.finto.modal.form.popup.treeviewreset,Reset,reset,nollaa,Återställ,
-custom.data.type.finto.modal.form.popup.treeviewsearch,Suchen,search,Hae,Sök,
-custom.data.type.finto.modal.form.popup.loadingstringtreeview,Baumansicht wird geladen,loading treeview,ladataan puunäkymää,Trädvy laddas,
-custom.data.type.finto.modal.form.popup.add_choose,Datensatz verknüpfen,Link record,Linkki,Länka post,
-custom.data.type.finto.modal.form.dropdown.choose,auswählen ..,choose ..,valitse ..,Välj ..,
-custom.data.type.finto.config.parameter.schema.lang.value.label,Sprache (ISO 639-1) der Ergebnislabel,Language (ISO 639-1) of resultlabels,Hakutulosten kieli (ISO 639-1), esim. fi.,Språk (ISO 639-1) för resultatetiketter
-custom.data.type.finto.setting.schema.lang,Keine Sprache angegeben,No language configured,Kieltä ei ole määritetty,Inget språk angivet,
-custom.data.type.finto.modal.form.popup.choose_manual_label,Auswahl eines Labels, Choose a label,Valitse tunniste,Val av etikett,
-custom.data.type.finto.modal.form.popup.choose_expertsearchmode_.exact,Exakt diese Auswahl,Exact this selection,Juuri tämä valinta,Exakt detta val,
-custom.data.type.finto.modal.form.popup.choose_expertsearchmode_.exact_short,Exakt,Exact,Tarkalleen,Exakt,
-custom.data.type.finto.modal.form.popup.choose_expertsearchmode_.include_children,Auch Kinder einbeziehen,Include children too,Ota mukaan myös alataso,Inkludera även barn,
-custom.data.type.finto.modal.form.popup.choose_expertsearchmode_.include_children_short,Auch Kinder,Include children,Myös alataso,Även barn,
-custom.data.type.finto.modal.form.popup.choose_expertsearchmode_label,Suchmodus für Expertensuche wählen,Select search mode for expert search,Valitse hakutila tarkkaan hakuun,Välj söktyp för avancerad sökning,
-custom.data.type.finto.modal.form.popup.choose_expertsearchmode_label2,Was wollen Sie finden? Nur exakte Treffer oder auch alle Kinder und Kindeskinder ihrer Suchauswahl?,What do you want to find? Only exact hits or also all children and grandchildren in your search selection?,Mitä haluat löytää? Vain tarkat osumat vai myös kaikki hakutuloksen alatasolta?,Vad vill du hitta? Endast exakta träffar eller även alla barn och barnbarn till din sökning?,
-custom.data.type.finto.modal.form.popup.choose_expertsearchmode_label3,Ausgewählt,Selected,Valittu,Valda,
-custom.data.type.commons.popover.choose.label,Auswahl treffen,choose,valitse,Välj,
-custom.data.type.commons.modal.form.popup.loadingstring,Lade Informationen,loading,ladataan tietoja,Ladda information,
-custom.data.type.commons.controls.search.label,Suchen,Search,Hae,Sök,
-custom.data.type.commons.controls.detailinfo.label,Detailinfo, Details,Tiedot,Detaljer,
-custom.data.type.commons.controls.calluri.label,Uri aufrufen,Call URI,Verkkolinkki,Öppna URI,
-custom.data.type.commons.controls.delete.label,Löschen,Delete,Poista,Radera,
+key,de-DE,en-US,fi-FI,sv-SE
+server.config.name.system.update_interval_finto,Updateeinstellungen für FINTO-Verknüpfungen,Update settings for FINTO-Relations,FINTO linkityksen asetukset,Uppdateringsinställningar för FINTO-länkar
+server.config.parameter.system.update_interval_finto.days.label,Tage zwischen Updates,Days between updates,Päiviä päivitysten välillä,Dagar mellan uppdateringar
+server.config.parameter.system.update_interval_finto.default_language.label,Standard-Datensprache als Fallback für Update (ISO 639-1),Default-data-language (as fallback) for update (ISO 639-1),Päivityksen oletuskieli (ISO 639-1),Standarddataspråk som reserv för uppdatering (ISO 639-1)
+custom.data.type.finto.name,FINTO-Verknüpfung,FINTO-Relation,FINTO linkitys,FINTO-relation
+custom.data.type.finto.parent.name,Eltern-URI,Parent-URI,Ylätason URI,Förälder-URI
+custom.data.type.finto.language.name,Sprache,Language,Kieli,Språk
+custom.data.type.finto.config.parameter.schema.vocabulary_notation.value.label,Vokabular-Notation,Vocabulary-notation,Sanastot välilyönnillä erotettuna,Vokabulärnotation
+custom.data.type.finto.setting.schema.no_vocabulary_notation,Keine Vokabular-Notation gegeben,No vocabulary-notation given,Sanastoja ei ole määritetty,Ingen vokabulärnotation angiven
+custom.data.type.finto.config.parameter.schema.vocabulary_parent.value.label,Parent-URI (only dropdown and popup-mode. Not treeview. Obligatory for drilldown!),Parent-URI (only dropdown and popup-mode. Not treeview. Obligatory for drilldown!),Ylätason URI (vain pudotusvalikossa ja ponnahdusikkunassa. Ei puunäkymässä. Pakollinen yksityiskohtiin!),Förälder-URI (endast dropdown- och popup-läge. Obligatorisk för att granska nedåt!)
+custom.data.type.finto.setting.schema.vocabulary_parent,Keine Parent-URI hinterlegt,No parent URI given,Ylätason URI-osoitetta ei ole annettu,Ingen förälder-URI angiven
+custom.data.type.finto.setting.schema,Keine Suchsprache hinterlegt,No searchlanguage given,Hakukieltä ei ole annettu,Inget sökspråk angivet
+custom.data.type.finto.modal.form.dropdown.nolabelinlanguagefound,Kein Label in aktiver Sprache,No Label in active language,Ei tunnistetta aktiivisella kielellä,Ingen etikett på aktivt språk
+custom.data.type.finto.config.parameter.mask.editor_style.value.label,Editor-Stil,Editor-Style,Editorin tyyli,Redigerarstil
+custom.data.type.finto.config.option.mask.editor_style.value.popover,Popover,Popover,Ponnahdusikkuna,Popup
+custom.data.type.finto.config.option.mask.editor_style.value.dropdown,Dropdown,Dropdown,Alasvetovalikko,Rullgardinsmeny
+custom.data.type.finto.config.option.mask.editor_style.value.popover_treeview,Popover mit Baumansicht,Popover with treeview,Puunäkymän ponnahdusikkuna,Popup med trädvy
+custom.data.type.finto.config.parameter.mask.allow_label_choice.value.label,Erlaube die händische Auswahl aus den gegebenen Labels,Allow manual choice from available labels,Salli manuaalinen valinta,Tillåt manuellt val från givna etiketter
+custom.data.type.finto.config.parameter.mask.allow_label_choice.value.checkbox,Erlaubt,Allowed,Sallittu,Tillåtet
+custom.data.type.finto.config.parameter.mask.default_concept_uri.value.label,Standard-URI,Standard-URI,Oletus-URI,Standard-URI
+custom.data.type.finto.config.parameter.mask.default_concept_name.value.label,Standard-Name,Standard-Name,Oletusnimi,Standardnamn
+custom.data.type.finto.modal.form.popup.choose,"Auswahl aus dem ""Finnischen Thesaurus und Ontology Service ""","Choose record from ""Finnish Thesaurus and Ontology Service""",Valinta Fintosta,"Val från ""Finnish Thesaurus and Ontology Service"""
+custom.data.type.finto.modal.form.text.searchbar,Suchbegriff eingeben,Enter searchterm,Anna hakutermi,Ange sökterm
+custom.data.type.finto.modal.form.text.searchbar.placeholder, tippen ... ,type sth. ...,etsi…,fyll i ...
+custom.data.type.finto.modal.form.loadingSuggestions,Vorschläge werden geladen,Suggestions are being loaded,Ehdotuksia ladataan,Förslag laddas
+custom.data.type.finto.modal.form.popup.suggest.nohit,Kein Treffer,No hit,Ei tuloksia,Inga resultat
+custom.data.type.finto.modal.form.text.count,Maximale Treffer,Max hits,Tuloksien maksimimäärä,Maximala resultat
+custom.data.type.finto.modal.form.text.count_short,Treffer,hits,tulosta,Resultat
+custom.data.type.finto.modal.form.popup.loadingstring,Weitere Informationen laden,loading full information,ladataan täydet tiedot,Ladda mer information
+custom.data.type.finto.modal.form.dropdown.selectvocabularyLabel,Vokabular,Vocabulary,Sanasto,Vokabulär
+custom.data.type.finto.modal.form.dropdown.choosefromvocall,Alle Vokabulare,All vocabularys,Kaikki sanastot,Alla vokabulärer
+custom.data.type.finto.modal.form.popup.treeview.nopreflabel,ohne Label,without label,ilman tunnistetta,utan etikett
+custom.data.type.finto.modal.form.popup.json.preview.nopreflabel,ohne Label,without label,ilman tunnistetta,utan etikett
+custom.data.type.finto.modal.form.popup.jsonpreview.terms,Bezeichnungen,Terms,Muunkieliset termit,Benämningar
+custom.data.type.finto.modal.form.popup.jsonpreview.altterms,Andere Bezeichnungen,Alternative terms,Vaihtoehtoiset termit,Andra benämningar
+custom.data.type.finto.modal.form.popup.jsonpreview.hiddenterms,Versteckte Bezeichnungen,Hidden terms,Piilotetut termit,Dolda benämningar
+custom.data.type.finto.modal.form.popup.jsonpreview.definition,Definition,Definition,Määritelmä,Definition
+custom.data.type.finto.modal.form.popup.jsonpreview.scopenote,Verwendungshinweis,ScopeNote,Käyttöilmoitus,Användningsanvisning
+custom.data.type.finto.modal.form.popup.jsonpreview.note,Notiz,Note,Lisätiedot,Notering
+custom.data.type.finto.modal.form.popup.treeviewreset,Reset,reset,nollaa,Återställ
+custom.data.type.finto.modal.form.popup.treeviewsearch,Suchen,search,Hae,Sök
+custom.data.type.finto.modal.form.popup.loadingstringtreeview,Baumansicht wird geladen,loading treeview,ladataan puunäkymää,Trädvy laddas
+custom.data.type.finto.modal.form.popup.add_choose,Datensatz verknüpfen,Link record,Linkki,Länka post
+custom.data.type.finto.modal.form.dropdown.choose,auswählen ..,choose ..,valitse ..,Välj ..
+custom.data.type.finto.config.parameter.schema.lang.value.label,Sprache (ISO 639-1) der Ergebnislabel,Language (ISO 639-1) of resultlabels,"Hakutulosten kieli (ISO 639-1), esim. fi.","Språk (ISO 639-1) för resultatetiketter"
+custom.data.type.finto.setting.schema.lang,Keine Sprache angegeben,No language configured,Kieltä ei ole määritetty,Inget språk angivet
+custom.data.type.finto.modal.form.popup.choose_manual_label,Auswahl eines Labels, Choose a label,Valitse tunniste,Val av etikett
+custom.data.type.finto.modal.form.popup.choose_expertsearchmode_.exact,Exakt diese Auswahl,Exact this selection,Juuri tämä valinta,Exakt detta val
+custom.data.type.finto.modal.form.popup.choose_expertsearchmode_.exact_short,Exakt,Exact,Tarkalleen,Exakt
+custom.data.type.finto.modal.form.popup.choose_expertsearchmode_.include_children,Auch Kinder einbeziehen,Include children too,Ota mukaan myös alataso,Inkludera även barn
+custom.data.type.finto.modal.form.popup.choose_expertsearchmode_.include_children_short,Auch Kinder,Include children,Myös alataso,Även barn
+custom.data.type.finto.modal.form.popup.choose_expertsearchmode_label,Suchmodus für Expertensuche wählen,Select search mode for expert search,Valitse hakutila tarkkaan hakuun,Välj söktyp för avancerad sökning
+custom.data.type.finto.modal.form.popup.choose_expertsearchmode_label2,Was wollen Sie finden? Nur exakte Treffer oder auch alle Kinder und Kindeskinder ihrer Suchauswahl?,What do you want to find? Only exact hits or also all children and grandchildren in your search selection?,Mitä haluat löytää? Vain tarkat osumat vai myös kaikki hakutuloksen alatasolta?,Vad vill du hitta? Endast exakta träffar eller även alla barn och barnbarn till din sökning?
+custom.data.type.finto.modal.form.popup.choose_expertsearchmode_label3,Ausgewählt,Selected,Valittu,Valda
+custom.data.type.commons.popover.choose.label,Auswahl treffen,choose,valitse,Välj
+custom.data.type.commons.modal.form.popup.loadingstring,Lade Informationen,loading,ladataan tietoja,Ladda information
+custom.data.type.commons.controls.search.label,Suchen,Search,Hae,Sök
+custom.data.type.commons.controls.detailinfo.label,Detailinfo, Details,Tiedot,Detaljer
+custom.data.type.commons.controls.calluri.label,Uri aufrufen,Call URI,Verkkolinkki,Öppna URI
+custom.data.type.commons.controls.delete.label,Löschen,Delete,Poista,Radera
