@@ -248,7 +248,7 @@ class FINTO_ListViewTreeNode extends CUI.ListViewTreeNode
                                   desiredLanguage = CustomDataTypeFINTO.prototype.getLanguageParameterForRequests()
 
                                   # save conceptName
-                                  that.conceptName = FINTOUtilities.getPrefLabelFromDataResult(resultJSON, desiredLanguage, frontendLanguages)
+                                  that._cdata.conceptName = FINTOUtilities.getPrefLabelFromDataResult(resultJSON, desiredLanguage, frontendLanguages)
                                   # save conceptURI
                                   that._cdata.conceptURI = resultJSON.uri
                                   # save conceptSource
@@ -261,7 +261,7 @@ class FINTO_ListViewTreeNode extends CUI.ListViewTreeNode
                                   that._cdata.facetTerm = FINTOUtilities.getFacetTermFromJSONObject(resultJSON, databaseLanguages)
                                   # save frontendlanguage
                                   that._cdata.frontendLanguage = CustomDataTypeFINTO.prototype.getLanguageParameterForRequests()
-                                  
+
                                   # save ancestors if treeview, add ancestors
                                   that._cdata.conceptAncestors = []
                                   for i in [1...Object.keys(hierarchyJSON).length]
