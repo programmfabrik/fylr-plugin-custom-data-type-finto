@@ -55,7 +55,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
     language = @getCustomSchemaSettings()?.lang?.value
     # if not configures in db-modell, use frontendlanguage
     if !language
-      desiredLanguage = ez5.loca.getLanguage()
+      desiredLanguage = Object.assign({}, ez5.loca.getLanguage())
       desiredLanguage = desiredLanguage.split('-')
       language = desiredLanguage[0]
 
@@ -492,8 +492,8 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                         if json.uri == searchUri
                           resultJSON = json
 
-                      databaseLanguages = ez5.loca.getLanguageControl().getLanguages()
-                      frontendLanguages = ez5.session.getConfigFrontendLanguages()
+                      databaseLanguages = Object.assign({}, ez5.loca.getLanguageControl().getLanguages())
+                      frontendLanguages = Object.assign({}, ez5.session.getConfigFrontendLanguages())
                       desiredLanguage = that.getLanguageParameterForRequests()
 
                       # save conceptName
@@ -725,8 +725,8 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                               if json.uri == cdata.conceptURI
                                 resultJSON = json
 
-                            databaseLanguages = ez5.loca.getLanguageControl().getLanguages()
-                            frontendLanguages = ez5.session.getConfigFrontendLanguages()
+                            databaseLanguages = Object.assign({}, ez5.loca.getLanguageControl().getLanguages())
+                            frontendLanguages = Object.assign({}, ez5.session.getConfigFrontendLanguages())
                             desiredLanguage = that.getLanguageParameterForRequests()
 
                             # save conceptName
@@ -775,7 +775,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
     extendedInfo_xhr.xhr = new (CUI.XHR)(url: location.protocol + '//api.finto.fi/rest/v1/data?uri=' + uri + '&format=application%2Fjson')
     extendedInfo_xhr.xhr.start()
     .done((data, status, statusText) ->
-      htmlContent = FINTOUtilities.getJSONPreview(data, decodeURIComponent(uri), that.getLanguageParameterForRequests(), ez5.session.getConfigFrontendLanguages())
+      htmlContent = FINTOUtilities.getJSONPreview(data, decodeURIComponent(uri), that.getLanguageParameterForRequests(), Object.assign({}, ez5.session.getConfigFrontendLanguages()))
       tooltip.DOM.innerHTML = htmlContent
       tooltip.autoSize()
     )
