@@ -4,7 +4,7 @@ Programmfabrik GmbH. Please use the github issue tracking to report bugs
 and self organize bug fixing. Feel free to directly contact the committing
 developers.
 
-# easydb-custom-data-type-finto
+# fylr-custom-data-type-finto
 
 This is a plugin for [fylr](https://documentation.fylr.cloud/docs) with Custom Data Type `CustomDataTypeFINTO` for references to entities of the [Finnish Thesaurus and Ontology Service FINTO (https://finto.fi/)](https://finto.fi/).
 
