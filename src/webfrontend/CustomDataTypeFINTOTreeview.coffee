@@ -241,8 +241,8 @@ class FINTO_ListViewTreeNode extends CUI.ListViewTreeNode
                                   if that._context?.FieldSchema?.custom_settings?.allow_label_choice?.value == true && that._finto_opts?.mode == 'editor'
                                     CustomDataTypeFINTO.prototype.__chooseLabelManually(that._cdata, that._editor_layout, resultJSON, that._editor_layout, that._finto_opts)
 
-                                  databaseLanguages = Object.assign({}, ez5.loca.getLanguageControl().getLanguages())
-                                  frontendLanguages = Object.assign({}, ez5.session.getConfigFrontendLanguages())
+                                  databaseLanguages = CustomDataTypeFINTO.prototype.getDatabaseLanguages()
+                                  frontendLanguages = CustomDataTypeFINTO.prototype.getFrontendLanguages()
                                   desiredLanguage = CustomDataTypeFINTO.prototype.getLanguageParameterForRequests()
 
                                   # save conceptName

@@ -55,12 +55,25 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
     language = @getCustomSchemaSettings()?.lang?.value
     # if not configures in db-modell, use frontendlanguage
     if !language
-      desiredLanguage = Object.assign({}, ez5.loca.getLanguage())
+      desiredLanguage = ez5.loca.getLanguage()
       desiredLanguage = desiredLanguage.split('-')
       language = desiredLanguage[0]
 
     return language
 
+  #######################################################################
+  # returns the databaseLanguages
+  getDatabaseLanguages: () ->
+    databaseLanguages = ez5.loca.getLanguageControl().getLanguages().slice()
+
+    return databaseLanguages
+
+  #######################################################################
+  # returns the frontendLanguages
+  getFrontendLanguages: () ->
+    frontendLanguages = ez5.session.getConfigFrontendLanguages().slice()
+
+    return frontendLanguages
 
   #######################################################################
   # render popup as treeview?
@@ -492,8 +505,8 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                         if json.uri == searchUri
                           resultJSON = json
 
-                      databaseLanguages = Object.assign({}, ez5.loca.getLanguageControl().getLanguages())
-                      frontendLanguages = Object.assign({}, ez5.session.getConfigFrontendLanguages())
+                      databaseLanguages = that.getDatabaseLanguages()
+                      frontendLanguages = that.getFrontendLanguages()
                       desiredLanguage = that.getLanguageParameterForRequests()
 
                       # save conceptName
@@ -621,20 +634,6 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
 
 
   #######################################################################
-  # get frontend-language
-  getFrontendLanguage: () ->
-    # language
-    desiredLanguage = ez5?.loca?.getLanguage()
-    if desiredLanguage
-      desiredLanguage = desiredLanguage.split('-')
-      desiredLanguage = desiredLanguage[0]
-    else
-      desiredLanguage = false
-
-    desiredLanguage
-
-
-  #######################################################################
   # render form as DROPDOWN
   __renderEditorInputInline: (data, cdata, opts = {}) ->
         that = @
@@ -725,8 +724,8 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                               if json.uri == cdata.conceptURI
                                 resultJSON = json
 
-                            databaseLanguages = Object.assign({}, ez5.loca.getLanguageControl().getLanguages())
-                            frontendLanguages = Object.assign({}, ez5.session.getConfigFrontendLanguages())
+                            databaseLanguages = that.getDatabaseLanguages()
+                            frontendLanguages = that.getFrontendLanguages()
                             desiredLanguage = that.getLanguageParameterForRequests()
 
                             # save conceptName
@@ -775,7 +774,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
     extendedInfo_xhr.xhr = new (CUI.XHR)(url: location.protocol + '//api.finto.fi/rest/v1/data?uri=' + uri + '&format=application%2Fjson')
     extendedInfo_xhr.xhr.start()
     .done((data, status, statusText) ->
-      htmlContent = FINTOUtilities.getJSONPreview(data, decodeURIComponent(uri), that.getLanguageParameterForRequests(), Object.assign({}, ez5.session.getConfigFrontendLanguages()))
+      htmlContent = FINTOUtilities.getJSONPreview(data, decodeURIComponent(uri), that.getLanguageParameterForRequests(), that.getFrontendLanguages())
       tooltip.DOM.innerHTML = htmlContent
       tooltip.autoSize()
     )
