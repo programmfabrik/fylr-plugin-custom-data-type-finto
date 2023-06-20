@@ -40,7 +40,7 @@ build: clean ## clean, compile, copy files to build folder
 					cat src/tmp/FINTOUtilities.js >> build/$(PLUGIN_NAME)/updater/FintoUpdater.js
 					cp package.json build/$(PLUGIN_NAME)/package.json
 					cp -r node_modules build/$(PLUGIN_NAME)/
-					#rm -rf src/tmp # clean tmp
+					rm -rf src/tmp # clean tmp
 
 					cp l10n/customDataTypeFinto.csv build/$(PLUGIN_NAME)/l10n/customDataTypeFinto.csv # copy l10n
 
