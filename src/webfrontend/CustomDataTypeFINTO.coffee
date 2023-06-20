@@ -1013,7 +1013,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
             class: "pluginResultButton"
             appearance: "link"
             size: "normal"
-            href: 'https://uri.gbv.de/terminology/?uri=' + encodedURI
+            href: cdata.conceptURI
             target: "_blank"
             class: "cdt_finto_smallMarginTop"
             tooltip:

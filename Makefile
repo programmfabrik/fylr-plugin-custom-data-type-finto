@@ -27,13 +27,20 @@ build: clean ## clean, compile, copy files to build folder
 					cp easydb-library/src/commons.coffee src/tmp
 					cp src/webfrontend/*.coffee src/tmp
 					cd src/tmp && coffee -b --compile ${COFFEE_FILES} # bare-parameter is obligatory!
-					cat src/tmp/*.js > build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.js
+
+					# first: commons! Important
+					cat src/tmp/commons.js > build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.js
+
+					cat src/tmp/CustomDataTypeFINTO.js >> build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.js
+					cat src/tmp/CustomDataTypeFINTOFacet.js >> build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.js
+					cat src/tmp/CustomDataTypeFINTOTreeview.js >> build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.js
+					cat src/tmp/FINTOUtilities.js >> build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.js
 
 					cp src/updater/FINTOUpdater.js build/$(PLUGIN_NAME)/updater/FintoUpdater.js # build updater
 					cat src/tmp/FINTOUtilities.js >> build/$(PLUGIN_NAME)/updater/FintoUpdater.js
 					cp package.json build/$(PLUGIN_NAME)/package.json
 					cp -r node_modules build/$(PLUGIN_NAME)/
-					rm -rf src/tmp # clean tmp
+					#rm -rf src/tmp # clean tmp
 
 					cp l10n/customDataTypeFinto.csv build/$(PLUGIN_NAME)/l10n/customDataTypeFinto.csv # copy l10n
 
