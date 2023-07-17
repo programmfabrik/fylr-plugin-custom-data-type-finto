@@ -226,7 +226,7 @@ class FINTO_ListViewTreeNode extends CUI.ListViewTreeNode
                               dataEntry_xhr.start().done((resultJSON, status, statusText) ->
 
                                 # xhr for hierarchy-informations to fill "conceptAncestors"
-                                allHierarchyAPIPath = location.protocol + '//api.finto.fi/rest/v1/' + FINTOUtilities.getVocNotationFromURI(that._uri) + '/hierarchy?uri=' + that._uri + '&lang=' + CustomDataTypeFINTO.prototype.getLanguageParameterForRequests() + '&format=application%2Fjson'
+                                allHierarchyAPIPath = location.protocol + '//api.finto.fi/rest/v1/' + that._vocParameter + '/hierarchy?uri=' + that._uri + '&lang=' + CustomDataTypeFINTO.prototype.getLanguageParameterForRequests() + '&format=application%2Fjson'
                                 dataHierarchy_xhr = new (CUI.XHR)(url: allHierarchyAPIPath)
                                 dataHierarchy_xhr.start().done((hierarchyJSON, status, statusText) ->
 
@@ -250,7 +250,7 @@ class FINTO_ListViewTreeNode extends CUI.ListViewTreeNode
                                   # save conceptURI
                                   that._cdata.conceptURI = resultJSON.uri
                                   # save conceptSource
-                                  that._cdata.conceptSource = FINTOUtilities.getVocNotationFromURI(resultJSON.uri)
+                                  that._cdata.conceptSource = that._vocParameter
                                   # save _fulltext
                                   that._cdata._fulltext = FINTOUtilities.getFullTextFromJSONObject(resultJSON, databaseLanguages)
                                   # save _standard
@@ -325,7 +325,7 @@ class FINTO_ListViewTreeNode extends CUI.ListViewTreeNode
         @addColumn(new CUI.ListViewColumn(element: d, colspan: 1))
 
         CUI.Events.trigger
-          node: that._popover
+          node: d
           type: "content-resize"
 
         new CUI.Label(text: @_prefLabel)

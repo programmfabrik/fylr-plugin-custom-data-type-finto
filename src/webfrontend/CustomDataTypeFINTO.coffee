@@ -236,11 +236,22 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
       that = @
       choiceLabels = []
       #preflabels
-      for key, value of resultJSON.prefLabel
-        choiceLabels.push value.value
+      if Array.isArray(resultJSON.prefLabel)
+        for key, value of resultJSON.prefLabel
+          if value.value not in choiceLabels
+            choiceLabels.push value.value
+      else if resultJSON.prefLabel instanceof Object
+        if resultJSON.prefLabel.value not in choiceLabels
+          choiceLabels.push resultJSON.prefLabel.value
       # altlabels
-      for key, value of resultJSON.altLabel
-          choiceLabels.push value.value
+      if Array.isArray(resultJSON.altLabel)
+        for key, value of resultJSON.altLabel
+          if value.value not in choiceLabels
+            choiceLabels.push value.value
+      else if resultJSON.altLabel instanceof Object
+        if resultJSON.altLabel.value not in choiceLabels
+          choiceLabels.push resultJSON.altLabel.value
+
       prefLabelButtons = []
       for key, value of choiceLabels
         button = new CUI.Button
@@ -420,7 +431,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                 # new item
                 item =
                   text: record.prefLabel
-                  value: record.uri
+                  value: record.uri + '@' + record.vocab
                   tooltip:
                     markdown: true
                     placement: "ne"
@@ -455,13 +466,16 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                      menu_items.push item
               for suggestion,key2 in part
                 menu_items.push suggestion
-
             # set new items to menu
             itemList =
               onClick: (ev2, btn) ->
                 # if inline or treeview without popup
                 if ! that.renderPopupAsTreeview() || ! that.popover?.isShown()
-                  searchUri = btn.getOpt("value")
+                  valueParts = btn.getOpt("value")
+                  valueParts = valueParts.split '@'
+                  searchUri = valueParts[0]
+                  recordsOriginalVocab = valueParts[1]
+
                   if that.popover
                     # put a loader to popover
                     newLoaderPanel = new CUI.Pane
@@ -495,7 +509,8 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                   dataEntry_xhr = new (CUI.XHR)(url: allDataAPIPath)
                   dataEntry_xhr.start().done((resultJSON, status, statusText) ->
                     # xhr for hierarchy-informations to fill "conceptAncestors"
-                    allHierarchyAPIPath = location.protocol + '//api.finto.fi/rest/v1/' + FINTOUtilities.getVocNotationFromURI(searchUri) + '/hierarchy?uri=' + encodeURIComponent(searchUri) + '&lang=' + that.getLanguageParameterForRequests() + '&format=application%2Fjson'
+                    allHierarchyAPIPath = location.protocol + '//api.finto.fi/rest/v1/' + recordsOriginalVocab + '/hierarchy?uri=' + encodeURIComponent(searchUri) + '&lang=' + that.getLanguageParameterForRequests() + '&format=application%2Fjson'
+
                     dataHierarchy_xhr = new (CUI.XHR)(url: allHierarchyAPIPath)
                     dataHierarchy_xhr.start().done((hierarchyJSON, status, statusText) ->
 
@@ -514,7 +529,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                       # save conceptURI
                       cdata.conceptURI = resultJSON.uri
                       # save conceptSource
-                      cdata.conceptSource = FINTOUtilities.getVocNotationFromURI(resultJSON.uri)
+                      cdata.conceptSource = recordsOriginalVocab
                       # save _fulltext
                       cdata._fulltext = FINTOUtilities.getFullTextFromJSONObject(resultJSON, databaseLanguages)
                       # save _standard
