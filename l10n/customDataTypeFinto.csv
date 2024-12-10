@@ -58,3 +58,12 @@ custom.data.type.commons.controls.search.label,Suchen,Search,Hae,Sök
 custom.data.type.commons.controls.detailinfo.label,Detailinfo, Details,Tiedot,Detaljer
 custom.data.type.commons.controls.calluri.label,Uri aufrufen,Call URI,Verkkolinkki,Öppna URI
 custom.data.type.commons.controls.delete.label,Löschen,Delete,Poista,Radera
+server.config.parameter.system.mapbox.mapbox_api_key.label,Mapbox-Token,Mapbox-Token,Mapbox-Token,Mapbox-Token
+server.config.parameter.system.mapbox.mapbox_style.label,Mapbox-Style,Mapbox-Style,Mapbox-Style,Mapbox-Style
+server.config.name.system.mapbox,Mapbox-Konfiguration,Mapbox-Configuration,Mapbox-Configuration,Mapbox-Configuration
+custom.data.type.finto.config.parameter.mask.display_multiple_languages_in_searchhits.value.label,Zeige mehrere Sprachen in Suchergebnisauswahl an(ISO 639-1 & komma-separatiert),Show multiple languages ​​in search result selection (ISO 639-1 & comma-separated),Näytä useita kieliä hakutulosten valinnassa (ISO 639-1 ja pilkuilla eroteltu),Visa flera språk i val av sökresultat (ISO 639-1 & kommaseparerad)
+custom.data.type.finto.config.parameter.mask.editor_display.value.label,Editor-Ansicht,Editor-Display,Editor-Display,Editor-Display
+custom.data.type.finto.config.option.mask.editor_display.value.default,Standard,Default,Default,Default
+custom.data.type.finto.config.option.mask.editor_display.value.condensed,1 Zeile,One-liner,One-liner,One-liner
+custom.data.type.finto.config.parameter.mask.use_dropdown_info_popup.value.label,Infopopup?,Infopopup?,Infopopup?,Infopopup?
+custom.data.type.finto.config.parameter.mask.use_dropdown_info_popup.value.checkbox,Auch für Dropdown anzeigen,Show for dropdown too,Show for dropdown too,Show for dropdown too

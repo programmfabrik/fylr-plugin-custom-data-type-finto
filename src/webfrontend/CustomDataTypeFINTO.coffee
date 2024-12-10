@@ -4,9 +4,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
   # configure used facet
   getFacet: (opts) ->
       opts.field = @
-      new CustomDataTypeCommonFacet(opts)
-      # TODO
-      # new CustomDataTypeFINTOFacet(opts)
+      new CustomDataTypeFINTOFacet(opts)
 
   #######################################################################
   # return name of plugin
@@ -59,8 +57,21 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
       desiredLanguage = desiredLanguage.split('-')
       language = desiredLanguage[0]
 
+    if language == '*'
+      language = ''
+
     return language
 
+
+  #######################################################################
+  # get active frontend language
+  getActiveFrontendLanguage: () ->
+    frontendLanguage = ez5.loca.getLanguage()
+    frontendLanguage = frontendLanguage.split('-')
+    frontendLanguage = frontendLanguage[0]
+
+    return frontendLanguage
+  
   #######################################################################
   # returns the databaseLanguages
   getDatabaseLanguages: () ->
@@ -421,23 +432,46 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
             # a list of the unique text suggestions for treeview-suggest
             unique_text_suggestions = []
             unique_text_items = []
+            
+            uriOrderedRecords = []
             for recordKey, record of data
+              if ! uriOrderedRecords[record.uri]
+                uriOrderedRecords[record.uri] = []
+              uriOrderedRecords[record.uri].push record
+
+            for recordsURI, records of uriOrderedRecords
               vocab = 'default'
               if showHeadlines
-                vocab = record.vocab
+                vocab = records[0].vocab
               if ! Array.isArray tmp_items[vocab]
                 tmp_items[vocab] = []
-              do(record) ->
+              do(records) ->
+                # check and get if record exists in frontendlanguage in results
+                prefLabel = records[0].prefLabel;
+                for recordKey, record of records
+                  if record.lang == that.getActiveFrontendLanguage()
+                    prefLabel = record.prefLabel
+                    continue
+                # if labels are wanted it multiple languages (test with "joe")
+                langLabels = []
+                if that.getCustomMaskSettings()?.display_multiple_languages_in_searchhits?.value
+                  langEntries = that.getCustomMaskSettings().display_multiple_languages_in_searchhits.value.split(',')
+                  for recordKey, record of records
+                    if langEntries.includes record.lang
+                      langLabels.push record.prefLabel
+                  langLabels = Array.from new Set langLabels
+                  if langLabels.length > 0
+                    prefLabel = langLabels.join(' / ')
                 # new item
                 item =
-                  text: record.prefLabel
-                  value: record.uri + '@' + record.vocab
+                  text: prefLabel
+                  value: records[0].uri + '@' + records[0].vocab
                   tooltip:
                     markdown: true
                     placement: "ne"
                     content: (tooltip) ->
                       # show infopopup
-                      encodedURI = encodeURIComponent(record.uri)
+                      encodedURI = encodeURIComponent(records[0].uri)
                       that.__getAdditionalTooltipInfo(encodedURI, tooltip, extendedInfo_xhr)
                       new CUI.Label(icon: "spinner", text: $$('custom.data.type.finto.modal.form.popup.loadingstring'))
                 tmp_items[vocab].push item
@@ -496,18 +530,13 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                             ]
                     that.popover.setContent(newLoaderPanel)
 
-                  # if treeview in popup also get the ancestors
-                  ancestors = '';
-                  #if that.renderPopupAsTreeview() && ! that.popover
-                  if that.renderPopupAsTreeview()
-                    ancestors = ',ancestors'
-
                   # get full record to get correct preflabel in desired language
                   # load the record itself and also the hierarchie of the record
                   allDataAPIPath = location.protocol + '//api.finto.fi/rest/v1/data?uri=' + encodeURIComponent(searchUri) + '&format=application%2Fjson'
                   # XHR for basic information
                   dataEntry_xhr = new (CUI.XHR)(url: allDataAPIPath)
                   dataEntry_xhr.start().done((resultJSON, status, statusText) ->
+
                     # xhr for hierarchy-informations to fill "conceptAncestors"
                     allHierarchyAPIPath = location.protocol + '//api.finto.fi/rest/v1/' + recordsOriginalVocab + '/hierarchy?uri=' + encodeURIComponent(searchUri) + '&lang=' + that.getLanguageParameterForRequests() + '&format=application%2Fjson'
 
@@ -521,11 +550,11 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                           resultJSON = json
 
                       databaseLanguages = that.getDatabaseLanguages()
-                      frontendLanguages = that.getFrontendLanguages()
+                      frontendLanguage = that.getActiveFrontendLanguage()
                       desiredLanguage = that.getLanguageParameterForRequests()
 
                       # save conceptName
-                      cdata.conceptName = FINTOUtilities.getPrefLabelFromDataResult(resultJSON, desiredLanguage, frontendLanguages)
+                      cdata.conceptName = FINTOUtilities.getPrefLabelFromDataResult(resultJSON, databaseLanguages, frontendLanguage)
                       # save conceptURI
                       cdata.conceptURI = resultJSON.uri
                       # save conceptSource
@@ -536,8 +565,13 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                       cdata._standard = FINTOUtilities.getStandardFromJSONObject(resultJSON, databaseLanguages)
                       # save facet
                       cdata.facetTerm = FINTOUtilities.getFacetTermFromJSONObject(resultJSON, databaseLanguages)
+                      # save geo (also in _standard)
+                      geoJSON = FINTOUtilities.getGeoJSONFromFINTOJSON(resultJSON) 
+                      if geoJSON
+                        cdata.conceptGeoJSON = geoJSON
+
                       # save frontendlanguage
-                      cdata.frontendLanguage = that.getLanguageParameterForRequests()
+                      cdata.frontendLanguage = that.getActiveFrontendLanguage()
 
                       # save ancestors if treeview, add ancestors
                       cdata.conceptAncestors = []
@@ -570,17 +604,6 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                         else
                           anchor = input
                         that.__chooseLabelManually(cdata, layout, resultJSON, anchor, opts)
-                      # user is not allowed to choose-label manually --> choose prefLabel in default language
-                      else
-                        foundMatchingLabel = false
-                        if resultJSON.prefLabel.length > 0
-                          for prefLabelKey, prefLabelValue of resultJSON.prefLabel
-                            if prefLabelValue.lang == that.getLanguageParameterForRequests()
-                              cdata.conceptName = prefLabelValue.value
-                              foundMatchingLabel = true
-
-                        if ! foundMatchingLabel
-                          cdata.conceptName = resultJSON.prefLabel[Object.keys(resultJSON.prefLabel)[0]].value
                         # update the layout in form
                         that.__updateResult(cdata, layout, opts)
                         # close popover
@@ -591,6 +614,24 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                       # is this from exact search and user has to choose exact-search-mode?!
                       if that._finto_opts?.callFromExpertSearch == true
                         CustomDataTypeFINTO.prototype.__chooseExpertHierarchicalSearchMode(that._cdata, that._editor_layout, resultJSON, that._editor_layout, that._finto_opts)
+
+                      if opts?.data
+                          opts.data[that.name(opts)] = CUI.util.copyObject(cdata)
+                    
+                      CUI.Events.trigger
+                          node: layout
+                          type: "editor-changed"
+                      CUI.Events.trigger
+                          node: layout
+                          type: "data-changed"
+
+                      # update the layout in form
+                      that.__updateResult(cdata, layout, opts)
+                      # close popover
+                      if that.popover
+                        that.popover.hide()
+                      @
+
                     )
                   )
 
@@ -653,6 +694,17 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
   __renderEditorInputInline: (data, cdata, opts = {}) ->
         that = @
 
+        extendedInfo_xhr = { "xhr" : undefined }
+
+        # if multible vocabularys are given, show only the first one in dropdown
+        voc = 'yso'
+        vocTest = @getVocabularyNameFromDatamodel(opts)
+        vocTest = vocTest.split('|')
+        if(vocTest.length > 1)
+          voc = vocTest[0]
+        else
+          voc = @getVocabularyNameFromDatamodel(opts)
+
         fields = []
         select = {
             type: CUI.Select
@@ -662,14 +714,6 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
             options: (thisSelect) =>
                   dfr = new CUI.Deferred()
                   values = []
-
-                  # if multible vocabularys are given, show only the first one in dropdown
-                  vocTest = @getVocabularyNameFromDatamodel(opts)
-                  vocTest = vocTest.split('|')
-                  if(vocTest.length > 1)
-                    voc = vocTest[0]
-                  else
-                    voc = @getVocabularyNameFromDatamodel(opts)
 
                   # parent-parameter?
                   parentParameter = '123'
@@ -690,15 +734,26 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                       data = data.narrowerTransitive
 
                       for key, suggestion of data
-                        label = suggestion.prefLabel
-                        if ! label
-                          label = $$('custom.data.type.finto.modal.form.dropdown.nolabelinlanguagefound')
-                        if suggestion.uri != parentParameter
-                          item = (
-                            text: label
-                            value: suggestion.uri
-                          )
-                          select_items.push item
+                        do(key) ->
+                          label = suggestion.prefLabel
+                          if ! label
+                            label = $$('custom.data.type.finto.modal.form.dropdown.nolabelinlanguagefound')
+                          if suggestion.uri != parentParameter
+                            item = (
+                              text: label
+                              value: suggestion.uri
+                            )
+                            # only show tooltip, if configures in datamodel
+                            if that.getCustomMaskSettings()?.use_dropdown_info_popup?.value
+                              item.tooltip =
+                                markdown: true
+                                placement: 'nw'
+                                content: (tooltip) ->
+                                  # get jskos-details-data
+                                  that.__getAdditionalTooltipInfo(data[key].uri, tooltip, extendedInfo_xhr)
+                                  # loader, until details are xhred
+                                  new CUI.Label(icon: "spinner", text: $$('custom.data.type.finto.modal.form.popup.loadingstring'))
+                            select_items.push item
 
                       # if cdata is already set, choose correspondending option from select
                       if cdata?.conceptURI != ''
@@ -748,11 +803,15 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                             # save conceptURI
                             cdata.conceptURI = resultJSON.uri
                             # save conceptSource
-                            cdata.conceptSource = FINTOUtilities.getVocNotationFromURI(resultJSON.uri)
+                            cdata.conceptSource = voc
                             # save _fulltext
                             cdata._fulltext = FINTOUtilities.getFullTextFromJSONObject(resultJSON, databaseLanguages)
                             # save _standard
                             cdata._standard = FINTOUtilities.getStandardFromJSONObject(resultJSON, databaseLanguages)
+                            # save geo (also in _standard)
+                            geoJSON = FINTOUtilities.getGeoJSONFromFINTOJSON(resultJSON) 
+                            if geoJSON
+                              cdata.conceptGeoJSON = geoJSON
                             # save facet
                             cdata.facetTerm = FINTOUtilities.getFacetTermFromJSONObject(resultJSON, databaseLanguages)
                             # save frontendlanguage
@@ -789,7 +848,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
     extendedInfo_xhr.xhr = new (CUI.XHR)(url: location.protocol + '//api.finto.fi/rest/v1/data?uri=' + uri + '&format=application%2Fjson')
     extendedInfo_xhr.xhr.start()
     .done((data, status, statusText) ->
-      htmlContent = FINTOUtilities.getJSONPreview(data, decodeURIComponent(uri), that.getLanguageParameterForRequests(), that.getFrontendLanguages())
+      htmlContent = FINTOUtilities.getJSONPreview(that, data, decodeURIComponent(uri), that.getLanguageParameterForRequests(), that.getDatabaseLanguages(), that.getFrontendLanguages())
       tooltip.DOM.innerHTML = htmlContent
       tooltip.autoSize()
     )
@@ -808,11 +867,13 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
     # get vocparameter from dropdown, if available...
     popoverVocabularySelectTest = cdata_form.getFieldsByName("finto_PopoverVocabularySelect")[0]
     if popoverVocabularySelectTest?.getValue()
-      vocParameter = popoverVocabularySelectTest?.getValue()
+      vocParameter = popoverVocabularySelectTest.getValue()
     else
-      # else get first voc from given voclist (1-n)
+      # else get first voc from given voclist
       vocParameter = that.getActiveVocabularyName(cdata)
-      vocParameter = vocParameter.split('|')
+      vocParameter = vocParameter.replace /,/g, " "
+      vocParameter = vocParameter.replace /\|/g, " "
+      vocParameter = vocParameter.split(' ')
       vocParameter = vocParameter[0]
 
     treeview = new FINTO_ListViewTree(popover, layout, cdata, cdata_form, that, opts, vocParameter)
@@ -828,6 +889,8 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
         center:
             content: [
                 treeview.treeview
+              ,
+                cdata_form
             ]
 
     @popover.setContent(treeviewPane)
@@ -866,6 +929,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
         searchbar = cdata_form.getFieldsByName("searchbarInput")[0]
         if searchbar
           searchbar.reset()
+          searchbar.setValue('')
 
     # init xhr-object to abort running xhrs
     searchsuggest_xhr = { "xhr" : undefined }
@@ -879,14 +943,16 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
         if elem.opts.name == 'finto_PopoverVocabularySelect' && that.renderPopupAsTreeview()
           @buildAndSetTreeviewLayout(@popover, layout, cdata, cdata_form, that, false, opts)
         that.__setEditorFieldStatus(cdata, layout)
-        if elem.opts.name == 'searchbarInput' || elem.opts.name == 'finto_PopoverVocabularySelect'  || elem.opts.name == 'finto_countSuggestions'
+        if (elem.opts.name == 'searchbarInput' || elem.opts.name == 'finto_PopoverVocabularySelect'  || elem.opts.name == 'finto_countSuggestions') && ! that.renderPopupAsTreeview()
           that.__updateSuggestionsMenu(cdata, cdata_form, data.searchbarInput, elem, suggest_Menu, searchsuggest_xhr, layout, opts)
     .start()
 
     # init suggestmenu
-    suggest_Menu = new CUI.Menu
-        element : cdata_form.getFieldsByName("searchbarInput")[0]
-        use_element_width_as_min_width: true
+    suggest_Menu = cdata_form.getFieldsByName("searchbarInput")[0]
+    if suggest_Menu
+      suggest_Menu= new CUI.Menu
+          element : cdata_form.getFieldsByName("searchbarInput")[0]
+          use_element_width_as_min_width: true
 
     # treeview?
     if that.renderPopupAsTreeview()
@@ -928,7 +994,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
             # start new request and download all vocabulary-informations
             searchsuggest_xhr = new (CUI.XHR)(url: location.protocol + '//api.finto.fi/rest/v1/vocabularies?lang=' + that.getLanguageParameterForRequests())
             searchsuggest_xhr.start().done((data, status, statusText) ->
-                # read options for select
+                # enter the vocs to select in same order as in given in datamodell, because result from api is more or less random
                 select_items = []
                 # allow to choose all vocs only, if not treeview
                 if ! that.renderPopupAsTreeview()
@@ -937,14 +1003,15 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
                     value: that.getVocabularyNameFromDatamodel()
                   )
                   select_items.push item
-                for entry, key in data.vocabularies
-                  # add vocs to select
-                  if splittedVocs.includes(entry.id)
-                    item = (
-                      text: entry.title
-                      value: entry.id
-                    )
-                    select_items.push item
+                for splittedVoc, splittedVocKey in splittedVocs
+                  for entry, key in data.vocabularies
+                    # add vocs to select
+                    if splittedVoc == entry.id
+                      item = (
+                        text: entry.title
+                        value: entry.id
+                      )
+                      select_items.push item
 
                 thisSelect.enable()
                 dfr.resolve(select_items)
@@ -981,7 +1048,9 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
         ]
       }
 
-    fields.push maxhits
+    # not in popover-mode
+    if ! that.renderPopupAsTreeview()
+      fields.push maxhits
 
     # searchfield (autocomplete)
     option =  {
@@ -993,7 +1062,9 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
           placeholder: $$("custom.data.type.finto.modal.form.text.searchbar.placeholder")
           name: "searchbarInput"
         }
-    fields.push option
+    # not in popover-mode
+    if ! that.renderPopupAsTreeview()
+      fields.push option
 
     fields
 
@@ -1012,6 +1083,12 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
 
     extendedInfo_xhr = { "xhr" : undefined }
 
+    # show label of button in active frontendlanguage, if possible, else fallback to conceptName
+    label = cdata.conceptName
+    if cdata?._standard?.l10ntext
+      if cdata._standard?.l10ntext[ez5.loca.getLanguage()]
+        label = cdata._standard?.l10ntext[ez5.loca.getLanguage()]
+
     # output Button with Name of picked finto-Entry and URI
     encodedURI = encodeURIComponent(cdata.conceptURI)
     new CUI.HorizontalLayout
@@ -1020,7 +1097,7 @@ class CustomDataTypeFINTO extends CustomDataTypeWithCommons
         content:
           new CUI.Label
             centered: false
-            text: cdata.conceptName
+            text: label
       center:
         content:
           new CUI.ButtonHref

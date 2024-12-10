@@ -47,6 +47,21 @@ class FINTOUtilities
     else
       return false
 
+  ########################################################################
+  # extract geoinformation and make geojson
+  @getGeoJSONFromFINTOJSON: (object) ->
+
+    geoJSON = false
+    coordsFound = false
+
+    # lat + lng?
+    if object? and object['http://www.w3.org/2003/01/geo/wgs84_pos#lat']? and object['http://www.w3.org/2003/01/geo/wgs84_pos#long']?
+        geoJSON =
+            type: "Point"
+            coordinates: [object['http://www.w3.org/2003/01/geo/wgs84_pos#long']*1, object['http://www.w3.org/2003/01/geo/wgs84_pos#lat']*1]
+        coordsFound = true
+
+    return geoJSON
 
   ########################################################################
   # generates the fulltext for a given graph-record
@@ -160,6 +175,12 @@ class FINTOUtilities
 
     # if l10n-object is not empty
     _standard.l10ntext = l10nObject
+
+    # add geojson, if given
+    geoJSON = @getGeoJSONFromFINTOJSON json
+    if geoJSON
+       _standard.geo =  geoJSON
+
     return _standard
 
 
@@ -214,7 +235,7 @@ class FINTOUtilities
   #############################################################################
   # generates a html-preview for a given json-record
   #############################################################################
-  @getJSONPreview = (data, uri, desiredLanguage, frontendLanguages) ->
+  @getJSONPreview = (context, data, uri, desiredLanguage, databaseLanguages, frontendLanguages) ->
     that = @
     html = ''
 
@@ -225,7 +246,7 @@ class FINTOUtilities
       if record.uri == uri
         prefLabel = $$('custom.data.type.finto.modal.form.popup.jsonpreview.nopreflabel')
         if record?.prefLabel
-          prefLabel = that.getPrefLabelFromDataResult(record, desiredLanguage, frontendLanguages)
+          prefLabel = that.getPrefLabelFromDataResult(record, desiredLanguage, databaseLanguages, frontendLanguages)
 
         html += '<div style="font-size: 12px; color: #999;"><span class="cui-label-icon"><i class="fa  fa-external-link"></i></span>&nbsp;' + record.uri + '</div>'
 
@@ -306,27 +327,47 @@ class FINTOUtilities
           if note
             html += '<h4>' + $$('custom.data.type.finto.modal.form.popup.jsonpreview.note') + '</h4>' + note
 
+        # map (if mapbox-token is given)
+        baseConfig = ez5.session.getBaseConfig("plugin", "custom-data-type-finto")
+        if baseConfig?.mapbox?.mapbox_api_key
+          geoJSON = that.getGeoJSONFromFINTOJSON(record)
+          if geoJSON
+            mapbox_api_key = baseConfig.mapbox.mapbox_api_key
+            wrappedGeoJSON = JSON.parse('{"geometry":' + JSON.stringify(geoJSON) + '}')
+
+            # generates static mapbox-map via geojson
+            jsonStr = '{"type": "FeatureCollection","features": [{"geometry":{}}]}'
+            fullgeoJSON = JSON.parse(jsonStr)
+
+            fullgeoJSON.features[0].geometry = geoJSON
+
+            bounds = geojsonExtent(fullgeoJSON)
+            if bounds
+              size = [
+                500
+                300
+              ]
+              vp = geoViewport.viewport(bounds, size)
+              encodedGeoJSON = wrappedGeoJSON
+              encodedGeoJSON.properties = {}
+              encodedGeoJSON.type = "Feature"
+              encodedGeoJSON.properties['stroke-width'] = 4
+              encodedGeoJSON.properties['stroke'] = '#C20000'
+              encodedGeoJSON = JSON.stringify(encodedGeoJSON)
+              encodedGeoJSON = encodeURIComponent(encodedGeoJSON)
+              if vp.zoom > 16
+                vp.zoom = 12;
+              imageSrc = 'https://api.mapbox.com/styles/v1/mapbox/' + baseConfig.mapbox.mapbox_style +  '/static/geojson(' + encodedGeoJSON + ')/' +  vp.center.join(',') + ',' + vp.zoom + '/' + size.join('x') + '@2x?access_token=' + mapbox_api_key
+              html += '<div style="width:400px; height: 250px; background-size: contain; background-image: url(\'' + imageSrc + '\'); background-repeat: no-repeat; background-position: center center;"></div>'
+
+
         html = '<style>.fintoTooltip { padding: 10px; min-width:200px; }  .fintoTooltip h3 { margin-top: 10px; } .fintoTooltip h4 { margin-top: 14px; margin-bottom: 4px; }</style><div class="fintoTooltip">' + html + '</div>'
     return html
-
-
-  ############################################################################
-  # get vocabulary-notation from finto-uri
-  ############################################################################
-
-  @getVocNotationFromURI: (uri) ->
-    uri = decodeURIComponent(uri)
-    uri = uri.replace('http://www.yso.fi/onto/', '')
-    uriParts = uri.split('/')
-    notation = uriParts[0]
-
-    notation
-
 
   #############################################################################
   # get prefLabel from json (preferred in active Frontend-Language)
   #############################################################################
-  @getPrefLabelFromDataResult = (json, desiredLanguage, frontendLanguages) ->
+  @getPrefLabelFromDataResult = (json, databaseLanguages, activeFrontendLanguage) ->
       if typeof $$ != "undefined"
         prefLabelFallback = $$("custom.data.type.finto.modal.form.popup.treeview.nopreflabel")
       else
@@ -337,11 +378,6 @@ class FINTOUtilities
 
       prefLabel = prefLabelFallback;
 
-      for key, value of frontendLanguages
-        tmp = value.split('-')
-        tmp = tmp[0]
-        frontendLanguages[key] = tmp
-
       # if only 1 preflabel, than as object
       if ! Array.isArray json.prefLabel
         if json.prefLabel.value
@@ -349,12 +385,12 @@ class FINTOUtilities
 
       # try to find label in given frontend-language
       for key, value of json.prefLabel
-        if value.lang == desiredLanguage
+        if value.lang == activeFrontendLanguage
           return value.value
 
-      # if no preflabel in active frontendlanguage, choose a random label from configured frontendlanguages
+      # if no preflabel in active frontendlanguage, choose a random label
       for key, value of json.prefLabel
-        if frontendLanguages.includes value.lang
+        if databaseLanguages.includes value.lang
           return value.value
 
       # else a random language

@@ -255,6 +255,10 @@ class FINTO_ListViewTreeNode extends CUI.ListViewTreeNode
                                   that._cdata._fulltext = FINTOUtilities.getFullTextFromJSONObject(resultJSON, databaseLanguages)
                                   # save _standard
                                   that._cdata._standard = FINTOUtilities.getStandardFromJSONObject(resultJSON, databaseLanguages)
+                                  # save geo (also in _standard)
+                                  geoJSON = FINTOUtilities.getGeoJSONFromFINTOJSON(resultJSON) 
+                                  if geoJSON
+                                    that._cdata.conceptGeoJSON = geoJSON
                                   # save facet
                                   that._cdata.facetTerm = FINTOUtilities.getFacetTermFromJSONObject(resultJSON, databaseLanguages)
                                   # save frontendlanguage

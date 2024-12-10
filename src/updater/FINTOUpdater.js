@@ -6,7 +6,15 @@ const fetch = (...args) => import('node-fetch').then(({
 
 let databaseLanguages = [];
 let frontendLanguages = [];
+let defaultLanguage = 'fi';
 
+let info = {}
+
+let access_token = '';
+
+if (process.argv.length >= 3) {
+    info = JSON.parse(process.argv[2])
+}
 
 function hasChanges(objectOne, objectTwo) {
   var len;
@@ -18,6 +26,28 @@ function hasChanges(objectOne, objectTwo) {
     }
   }
   return false;
+}
+
+function getConfigFromAPI() {
+  return new Promise((resolve, reject) => {
+          var url = 'http://fylr.localhost:8081/api/v1/config?access_token=' + access_token
+          fetch(url, {
+                          headers: {
+                                  'Accept': 'application/json'
+                          },
+                  })
+                  .then(response => {
+                          if (response.ok) {
+                                  resolve(response.json());
+                          } else {
+                                  console.error("FINTO-Updater: Fehler bei der Anfrage an /config ");
+                          }
+                  })
+                  .catch(error => {
+                          console.error(error);
+                          console.error("FINTO-Updater: Fehler bei der Anfrage an /config");
+                  });
+  });
 }
 
 main = (payload) => {
@@ -39,7 +69,9 @@ main = (payload) => {
       // collect URIs
       let URIList = [];
       for (var i = 0; i < payload.objects.length; i++) {
-        URIList.push(payload.objects[i].data.conceptURI);
+        if(payload.objects[i].data.conceptURI && payload.objects[i].data.conceptSource) {
+          URIList.push(payload.objects[i].data.conceptURI + '@@@' + payload.objects[i].data.conceptSource);
+        }
       }
       // unique urilist
       URIList = [...new Set(URIList)]
@@ -47,9 +79,12 @@ main = (payload) => {
       let requestUrls = [];
       let requests = [];
 
-      URIList.forEach((uri) => {
+      URIList.forEach((info) => {
+        let parts = info.split('@@@');
+        const uri = parts[0];
+        const vocNotation = parts[1];
         let dataRequestUrl = 'https://api.finto.fi/rest/v1/data?uri=' + encodeURIComponent(uri) + '&format=application%2Fjson';
-        let hierarchieRequestUrl = 'https://api.finto.fi/rest/v1/' + FINTOUtilities.getVocNotationFromURI(uri) + '/hierarchy?uri=' + encodeURIComponent(uri) + '&lang=fi&format=application%2Fjson';
+        let hierarchieRequestUrl = 'https://api.finto.fi/rest/v1/' + vocNotation + '/hierarchy?uri=' + encodeURIComponent(uri) + '&lang=fi&format=application%2Fjson';
         let dataRequest = fetch(dataRequestUrl);
         let hierarchieRequest = fetch(hierarchieRequestUrl);
         requests.push({
@@ -132,18 +167,28 @@ main = (payload) => {
                 }
               });
               if (resultJSON) {
-                // get desired language for preflabel. This is frontendlanguage from original data...
-                let desiredLanguage = originalCdata.frontendLanguage;
+                // get desired language for conceptName. This is frontendlanguage from original data or fallback
+                let frontendLanguage = defaultLanguage;
+                if (originalCdata.frontendLanguage) {
+                    if (originalCdata.frontendLanguage.length == 2) {
+                      frontendLanguage = originalCdata.frontendLanguage;
+                    }
+                }
                 // save conceptName
-                newCdata.conceptName = FINTOUtilities.getPrefLabelFromDataResult(resultJSON, desiredLanguage, frontendLanguages);
+                newCdata.conceptName = FINTOUtilities.getPrefLabelFromDataResult(resultJSON, databaseLanguages, frontendLanguage)
                 // save conceptURI
                 newCdata.conceptURI = uri;
                 // save conceptSource
-                newCdata.conceptSource = FINTOUtilities.getVocNotationFromURI(uri);
+                newCdata.conceptSource = originalCdata.conceptSource;
                 // save _fulltext
                 newCdata._fulltext = FINTOUtilities.getFullTextFromJSONObject(resultJSON, databaseLanguages);
                 // save _standard
                 newCdata._standard = FINTOUtilities.getStandardFromJSONObject(resultJSON, databaseLanguages);
+                // save geo (alsonin _standard)
+                geoJSON = FINTOUtilities.getGeoJSONFromFINTOJSON(resultJSON);
+                if(geoJSON) {
+                  newCdata.conceptGeoJSON = geoJSON;
+                }
                 // save facet
                 newCdata.facetTerm = FINTOUtilities.getFacetTermFromJSONObject(resultJSON, databaseLanguages);
                 // save frontend language (same as given)
@@ -153,44 +198,53 @@ main = (payload) => {
 
             ///////////////////////////////////////////////////////
             // ancestors
+            newCdata.conceptAncestors = [];
+            if(originalCdata.conceptAncestors) {
+              newCdata.conceptAncestors = originalCdata.conceptAncestors;
+            }
             if (matchingRecordHierarchy.requestType == 'broader') {
-              let hierarchyJSON = matchingRecordHierarchy.data.broaderTransitive
-              // save ancestors if treeview, add ancestors
-              newCdata.conceptAncestors = [];
-              for (let i = 1; i < Object.keys(hierarchyJSON).length; i++) {
-                for (let [hierarchyKey, hierarchyValue] of Object.entries(hierarchyJSON)) {
-                  if (hierarchyKey !== uri) {
-                    // check if hierarchy-entry contains the actual record in narrowers
-                    // or if the narrower of the hierarchy-entry contains one of the already set ancestors
-                    let isnarrower = false;
-                    if (hierarchyValue.narrower) {
-                      if (!Array.isArray(hierarchyValue.narrower)) {
-                        hierarchyValue.narrower = [hierarchyValue.narrower];
-                      }
-                      for (let narrower of hierarchyValue.narrower) {
-                        if (narrower.uri === uri) {
-                          if (!newCdata.conceptAncestors.includes(hierarchyValue.uri)) {
-                            newCdata.conceptAncestors.push(hierarchyValue.uri);
+              if(matchingRecordHierarchy.data != null) {
+                if(matchingRecordHierarchy.data.broaderTransitive) {
+                  newCdata.conceptAncestors = [];
+                  let hierarchyJSON = matchingRecordHierarchy.data.broaderTransitive
+                  // save ancestors if treeview, add ancestors
+                  
+                  for (let i = 1; i < Object.keys(hierarchyJSON).length; i++) {
+                    for (let [hierarchyKey, hierarchyValue] of Object.entries(hierarchyJSON)) {
+                      if (hierarchyKey !== uri) {
+                        // check if hierarchy-entry contains the actual record in narrowers
+                        // or if the narrower of the hierarchy-entry contains one of the already set ancestors
+                        let isnarrower = false;
+                        if (hierarchyValue.narrower) {
+                          if (!Array.isArray(hierarchyValue.narrower)) {
+                            hierarchyValue.narrower = [hierarchyValue.narrower];
                           }
-                        } else if (newCdata.conceptAncestors.includes(narrower.uri)) {
-                          if (!newCdata.conceptAncestors.includes(hierarchyValue.uri)) {
-                            newCdata.conceptAncestors.push(hierarchyValue.uri);
+                          for (let narrower of hierarchyValue.narrower) {
+                            if (narrower.uri === uri) {
+                              if (!newCdata.conceptAncestors.includes(hierarchyValue.uri)) {
+                                newCdata.conceptAncestors.push(hierarchyValue.uri);
+                              }
+                            } else if (newCdata.conceptAncestors.includes(narrower.uri)) {
+                              if (!newCdata.conceptAncestors.includes(hierarchyValue.uri)) {
+                                newCdata.conceptAncestors.push(hierarchyValue.uri);
+                              }
+                            }
                           }
                         }
                       }
                     }
                   }
                 }
+                // add own uri to ancestor-uris
+                newCdata.conceptAncestors.push(uri);
+                // merge ancestors to string
+                newCdata.conceptAncestors = newCdata.conceptAncestors.join(' ');
               }
-              // add own uri to ancestor-uris
-              newCdata.conceptAncestors.push(uri);
-              // merge ancestors to string
-              newCdata.conceptAncestors = newCdata.conceptAncestors.join(' ');
-
-              if (hasChanges(payload.objects[index].data, newCdata)) {
-                payload.objects[index].data = newCdata;
-              } else {}
             }
+            if (hasChanges(payload.objects[index].data, newCdata)) {
+              payload.objects[index].data = newCdata;
+            } else {}
+            
           } else {
             console.error('No matching record found');
           }
@@ -242,56 +296,73 @@ outputErr = (err2) => {
 
   process.stdin.setEncoding('utf8');
 
-  ////////////////////////////////////////////////////////////////////////////
-  // get config and read the languages
-  ////////////////////////////////////////////////////////////////////////////
+  access_token = info && info.plugin_user_access_token;
+    
+  if(access_token) {
 
-  let config = JSON.parse(process.argv[2]);
+    ////////////////////////////////////////////////////////////////////////////
+    // get config and read the languages
+    ////////////////////////////////////////////////////////////////////////////
 
-  databaseLanguages = config.config.system.config.languages.database;
-  databaseLanguages = databaseLanguages.map((value, key, array) => {
-    return value.value;
-  });
+    getConfigFromAPI().then(config => {
+      databaseLanguages = config.system.config.languages.database;
+      databaseLanguages = databaseLanguages.map((value, key, array) => {
+          return value.value;
+      });
 
-  frontendLanguages = config.config.system.config.languages.frontend;
+      frontendLanguages = config.system.config.languages.frontend;
 
-  ////////////////////////////////////////////////////////////////////////////
-  // availabilityCheck for finto-api
-  ////////////////////////////////////////////////////////////////////////////
-  https.get('https://api.finto.fi/rest/v1/vocabularies?lang=fi', res => {
-    let testData = [];
-    res.on('data', chunk => {
-      testData.push(chunk);
-    });
-    res.on('end', () => {
-      const vocabs = JSON.parse(Buffer.concat(testData).toString());
-      if (vocabs.vocabularies) {
-        ////////////////////////////////////////////////////////////////////////////
-        // test successfull --> continue with custom-data-type-update
-        ////////////////////////////////////////////////////////////////////////////
-        process.stdin.on('readable', () => {
-          let chunk;
-          while ((chunk = process.stdin.read()) !== null) {
-            data = data + chunk
+      const testDefaultLanguageConfig = config.plugin['custom-data-type-finto'].config.update_interval_finto.default_language;
+      if (testDefaultLanguageConfig) {
+          if (testDefaultLanguageConfig.length == 2) {
+              defaultLanguage = testDefaultLanguageConfig;
           }
-        });
-        process.stdin.on('end', () => {
-          ///////////////////////////////////////
-          // continue with update-routine
-          ///////////////////////////////////////
-          try {
-            let payload = JSON.parse(data)
-            main(payload)
-          } catch (error) {
-            console.error("caught error", error)
-            outputErr(error)
-          }
-        });
-      } else {
-        console.error('Error while interpreting data from api.finto.fi: ', err.message);
       }
-    });
-  }).on('error', err => {
-    console.error('Error while receiving data from api.finto.fi: ', err.message);
-  });
+
+      ////////////////////////////////////////////////////////////////////////////
+      // availabilityCheck for finto-api
+      ////////////////////////////////////////////////////////////////////////////
+      https.get('https://api.finto.fi/rest/v1/vocabularies?lang=fi', res => {
+        let testData = [];
+        res.on('data', chunk => {
+          testData.push(chunk);
+        });
+        res.on('end', () => {
+          const vocabs = JSON.parse(Buffer.concat(testData).toString());
+          if (vocabs.vocabularies) {
+            ////////////////////////////////////////////////////////////////////////////
+            // test successfull --> continue with custom-data-type-update
+            ////////////////////////////////////////////////////////////////////////////
+            process.stdin.on('readable', () => {
+              let chunk;
+              while ((chunk = process.stdin.read()) !== null) {
+                data = data + chunk
+              }
+            });
+            process.stdin.on('end', () => {
+              ///////////////////////////////////////
+              // continue with update-routine
+              ///////////////////////////////////////
+              try {
+                let payload = JSON.parse(data)
+                main(payload)
+              } catch (error) {
+                console.error("caught error", error)
+                outputErr(error)
+              }
+            });
+          } else {
+            console.error('Error while interpreting data from api.finto.fi: ', err.message);
+          }
+        });
+      }).on('error', err => {
+        console.error('Error while receiving data from api.finto.fi: ', err.message);
+      });
+    }).catch(error => {
+      console.error('Es gab einen Fehler beim Laden der Konfiguration:', error);
+    }); 
+  }
+  else {
+    console.error("kein Accesstoken gefunden");
+  }
 })();

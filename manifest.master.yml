@@ -1,7 +1,7 @@
 plugin:
   name: custom-data-type-finto
-  version: 1.0
-  url: https://github.com/programmfabrik/fylr-custom-data-type-finto
+  version: 1.1
+  url: https://github.com/programmfabrik/fylr-plugin-custom-data-type-finto
   displayname:
     de-DE: FINTO-Verknüpfung
     en-US: FINTO-Referencing
@@ -28,6 +28,8 @@ custom_types:
         type: text
       conceptAncestors:
         type: text
+      conceptGeoJSON:
+        type: geo_json
       conceptSource:
         type: text
       facetTerm:
@@ -52,11 +54,26 @@ custom_types:
             value:
               type: select
               options: ["popover", "popover_treeview", "dropdown"]
+        - name: editor_display
+          parameters:
+            value:
+              type: select
+              options: ["default", "condensed"]
+        - name: use_dropdown_info_popup
+          parameters:
+            value:
+              type: bool
         - name: allow_label_choice
           parameters:
             value:
               type: bool
+        - name: display_multiple_languages_in_searchhits
+          parameters:
+            value:
+              type: text
     update:
+      plugin_user:
+        reference: system:root
       exec:
         service: "node"
         commands:
@@ -70,19 +87,21 @@ custom_types:
                 value: "%_exec.pluginDir%/updater/FintoUpdater.js"
               - type: "value"
                 value: "%info.json%"
-      timeout: 60
-      batch_size: 1
+      timeout: 120
+      batch_size: 10
       expires_days: 1
-      interval_base_config: update_interval_finto.days
 base_config:
+  - name: mapbox
+    group: mapbox
+    parameters:
+      mapbox_api_key:
+          type: text
+      mapbox_style:
+          type: text
+          default: "satellite-streets-v12"
   - name: update_interval_finto
     group: update_custom_data_type
     parameters:
-      days:
-        type: int
-        min: 0
-        default: 0
-        position: 0
       default_language:
         type: text
         default: 'fi'
