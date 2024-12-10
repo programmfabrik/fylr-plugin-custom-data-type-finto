@@ -46,7 +46,7 @@ The plugin appears as a separate data type in the data model of object types and
 * lang
   * language of labels to match
   * e.g. "en" or "fi" (ISO-639-1)
-  * fallback if not set: the active users fylr-frontendlanguage
+  * default: empty == * == all languages
   * optional parameter
 
 
@@ -57,18 +57,26 @@ Contains the feature options provided by easydb by default.
   * dropdown
   * popup
   * popup with treeview
+* editor_display
+    * display condensed in one line
+    * default display
+* use_dropdown_info_popup
+    * show infopopup also for dropdown? 
 * Allow label selection:
   * Allow manual selection from all available labels (preflabels + altlabels in all available languages. Has no effect in “Dropdown”-mode)
+* display_multiple_languages_in_searchhits
+    * a list of (ISO-639-1), seperated by comma ",". Then there will be multiple searchresult-display-labels in the configures languages separated with " / ". This is just display in search.
 
 
 ### baseconfiguration
 The update mechanism for the plugin data can be configured here.
-
-* days between updates
-  * The data stored in fylr is compared with the data from the FINTO API and then updated and re-indexed in fylr if necessary. This creates a corresponding load on the FINTO API.
 * default language
   * The default label language for updater requests (as fallback) (ISO 639-1)
-
+  
+Mapbox for map-display can be configured here
+* mapbox
+  * mapbox API token for map display
+  * mapbox-style for the maps. Default is "satellite-streets-v12"
 
 ## saved data
 * conceptName
@@ -116,7 +124,7 @@ The update mechanism for the plugin data can be configured here.
 
 
 ## updater
-* An automatic update mechanism is integrated. In the baseconfiguration, you can configure how often the update mechanism runs in the background (1 to 7 times a week). The updater iterates over each occurrence of the new data type and requests the FINTO API with the given URI. The result of this query is compared with the content in the fylr-database. If necessary, the status of the field content is updated.
+* An automatic update mechanism is integrated. The updater iterates over each occurrence of the new data type and requests the FINTO API with the given URI. The result of this query is compared with the content in the fylr-database. If necessary, the value is updated.
 
 
 
