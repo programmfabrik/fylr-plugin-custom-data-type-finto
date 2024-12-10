@@ -89,13 +89,17 @@ Mapbox for map-display can be configured here
        * ConceptSource = ysa
 * conceptAncestors
     * List of URI’s of the ancestors records plus the records URI itself
+* conceptGeoJSON
+    * geoJSON, if given
 * frontendLanguage
   * Includes a language. Either the language configured in the field in the data model is used here, or the front-end language as a fallback. The label is preferred and if not set manually in this language. The updater needs this information.
 * _fulltext
     * Label, URI, source and skos-notes are aggregated
 * _standard
     * List of preferred labels in different languages
-* _facet
+* _standard.geo
+    * geoJSON, if given
+* facetTerm
     * URI combined with preferred label in given frontend-language and in all other configured data-languages (as far as provided by the FINTO-API.)
 
 
