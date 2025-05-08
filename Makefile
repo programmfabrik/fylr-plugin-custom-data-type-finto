@@ -42,7 +42,33 @@ build: clean ## clean, compile, copy files to build folder
 					cp -r node_modules build/$(PLUGIN_NAME)/
 					rm -rf src/tmp # clean tmp
 
-					cp l10n/customDataTypeFinto.csv build/$(PLUGIN_NAME)/l10n/customDataTypeFinto.csv # copy l10n
+					mkdir src/temp_localization
+					cp l10n/customDataTypeFinto.csv src/temp_localization
+					cp easydb-library/src/commons.l10n.csv src/temp_localization
+
+					# equalize number of columns in localization csv files
+					@file1=src/temp_localization/customDataTypeFinto.csv \
+					file2=src/temp_localization/commons.l10n.csv \
+					cols1=$$(head -n 1 $$file1 | awk -F',' '{print NF}'); \
+					cols2=$$(head -n 1 $$file2 | awk -F',' '{print NF}'); \
+					echo "File1 columns: $$cols1, File2 columns: $$cols2"; \
+					if [ $$cols1 -lt $$cols2 ]; then \
+						diff=$$((cols2 - cols1)); \
+						echo "Padding $$file1 with $$diff empty columns..."; \
+						commas=$$(printf '%.0s,' $$(seq 1 $$diff)); \
+						sed -i "s/$$/$$commas/" $$file1; \
+					elif [ $$cols2 -lt $$cols1 ]; then \
+						diff=$$((cols1 - cols2)); \
+						echo "Padding $$file2 with $$diff empty columns..."; \
+						commas=$$(printf '%.0s,' $$(seq 1 $$diff)); \
+						sed -i "s/$$/$$commas/" $$file2; \
+					else \
+						echo "Files already have equal columns."; \
+					fi
+
+					cp src/temp_localization/customDataTypeFinto.csv build/$(PLUGIN_NAME)/l10n/customDataTypeFinto.csv # copy l10n
+					tail -n+2 src/temp_localization/commons.l10n.csv >> build/$(PLUGIN_NAME)/l10n/customDataTypeFinto.csv 
+					rm -rf src/temp_localization
 
 					cp src/webfrontend/css/main.css build/$(PLUGIN_NAME)/webfrontend/customDataTypeFinto.css # copy css
 					cp manifest.master.yml build/$(PLUGIN_NAME)/manifest.yml # copy manifest
